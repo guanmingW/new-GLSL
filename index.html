@@ -7,16 +7,19 @@
     <script type="text/javascript" src="dist/GlslCanvas.js"></script>
     <style>
         body {
-            background-image: url('angry.jpg'); /* 背景圖片的路徑和文件名 */
-            background-size: cover; /* 調整背景圖片大小以填滿整個屏幕 */
-            background-repeat: no-repeat; /* 避免圖片重複 */
-            background-attachment: fixed; /* 固定背景圖片，以確保在滾動時不會移動 */
+            background-image: url('angry.jpg'); /* 背景图像的路径和文件名 */
+            background-size: cover; /* 调整背景图像大小以填充整个屏幕 */
+            background-repeat: no-repeat; /* 避免图像重复 */
+            background-attachment: fixed; /* 固定背景图像，确保在滚动时不会移动 */
+            margin: 0; /* 去掉页面的默认边距 */
+            overflow: hidden; /* 隐藏溢出内容，以确保GLSL画布完全覆盖整个窗口 */
         }
         #glslCanvas {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -31,7 +34,5 @@
     var sandbox_title = "";
     var sandbox_author = "";
     var sandbox_thumbnail = "";
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
 </script>
 </html>
