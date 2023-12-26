@@ -6,48 +6,53 @@ uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
 
-uniform sampler2D u_tex0; // angry.jpg
-
-float glow(float d, float str, float thickness) {
-    return thickness / pow(d, str);
+float random(in float x) {
+    return fract(sin(x) * 1e4);
 }
 
-float square(vec2 P, float size) {
-    return max(abs(P.x), abs(P.y)) - size / (1.0);
-}
-
-float random(vec2 st) {
+float random(in vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-mat2 rotate2d(float _angle) {
-    return mat2(cos(_angle), -sin(_angle), sin(_angle), cos(_angle));
+float randomSerie(float x, float freq, float t) {
+    return step(0.8, random(floor(x * freq) - floor(t)));
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    vec2 st = gl_FragCoord.xy / u_resolution.xy;
 
-    uv.x *= u_resolution.x / u_resolution.y;
+    // 添加一些扭曲效果
+    st += 0.1 * sin(u_time);
 
-    // 使用"angry.jpg"作為背景
-    vec4 angryColor = texture2D(u_tex0, uv);
+    // 使用鼠标位置调整條碼效果的参数
+    float mouseEffect = 0.2; // 鼠标效果的強度
+    st += mouseEffect * (u_mouse - 0.5);
 
-    // 現有的GLSL效果代碼
-    vec2 uvs = uv * 36.0;
-    vec2 ipos = floor(uvs);  // get the integer coords
-    vec2 fpos = fract(uvs);  // get the fractional coords
-    uv = fpos * 2.0 - 1.0;
+    vec3 color = vec3(0.0);
 
-    //mouse distortion
-    vec2 mouse_ipose = floor(u_mouse.xy / u_resolution.xy * 36.0);
-    float dist = length(mouse_ipose - ipos) / 36.0;
-    dist = pow(1.0 - dist, 3.0) * 3.0;
-    uv *= rotate2d(dist + u_time);        //以亂數增加個體變化
+    // 第一个效果（條碼變換）
+    float cols = 2.0;
+    float freq = random(floor(u_time)) + abs(atan(u_time) * 0.1);
+    float t = 60.0 + u_time * (1.0 - freq) * 15.0; // 降低速度
 
-    //定義框
-    float squareUV = square(uv, 0.02 + 0.35 * dist + 0.15 * random(ipos));   //以亂數增加個體變化
-    float glowSquare = glow(squareUV, 0.4, 0.200);  //第一種寫法 by thickness/pow(dist, strength)
+    if (fract(st.y * cols * 0.5) < 0.5) {
+        t *= -1.0;
+    }
 
-    // 這裡使用"angry.jpg"的透明度作為紋理的透明度
-    gl_FragColor = vec4(vec3(glowSquare), angryColor.a); // 使用紋理的透明度，保留"angry.jpg"的透明度
+    freq += 0.005; // 调整频率的增量
+    float offset = 0.025;
+    color += vec3(randomSerie(st.x, freq * 99.528, t + offset),
+                  randomSerie(st.x, freq * 100.0, t),
+                  randomSerie(st.x, freq * 100.0, t - offset));
+
+    // 第二个效果（现代艺术感）
+    float freq2 = random(floor(u_time));
+    float t2 = u_time * 2.0;
+
+    freq2 += 0.005; // 调整频率的增量
+    color.r += 0.5 * sin(t2 + st.x + sin(freq2));
+    color.g += 0.5 * cos(t2 + st.y + cos(freq2));
+    color.b += 0.5 * sin(t2 + st.x + st.y);
+
+    gl_FragColor = vec4(1.0 - color, 1.0);
 }
