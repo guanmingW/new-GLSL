@@ -25,7 +25,7 @@ void main() {
     st += 0.1 * sin(u_time);
 
     // 使用鼠标位置调整條碼效果的参数
-    float mouseEffect = 0.2; // 鼠标效果的強度
+    float mouseEffect = 0.2; // 鼠标效果的强度
     st += mouseEffect * (u_mouse - 0.5);
 
     vec3 color = vec3(0.0);
@@ -54,5 +54,7 @@ void main() {
     color.g += 0.5 * cos(t2 + st.y + cos(freq2));
     color.b += 0.5 * sin(t2 + st.x + st.y);
 
-    gl_FragColor = vec4(1.0 - color, 1.0);
+    // 使用混合模式来控制背景图像的透明度
+    float alpha = 0.5; // 背景图像的透明度
+    gl_FragColor = mix(vec4(1.0 - color, 1.0), texture2D(u_texture, st), alpha);
 }
