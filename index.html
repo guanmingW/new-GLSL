@@ -7,7 +7,10 @@
     <script type="text/javascript" src="dist/GlslCanvas.js"></script>
     <style>
         body {
-            background: #101515;
+            background-image: url('angry.jpg'); /* 背景圖片的路徑和文件名 */
+            background-size: cover; /* 調整背景圖片大小以填滿整個屏幕 */
+            background-repeat: no-repeat; /* 避免圖片重複 */
+            background-attachment: fixed; /* 固定背景圖片，以確保在滾動時不會移動 */
         }
         #glslCanvas {
             position: absolute;
